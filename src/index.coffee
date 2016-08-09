@@ -1,10 +1,14 @@
-app = (supported, def) ->
+app = (supported, def, cb) ->
   unless supported instanceof Locales
     supported = new Locales supported, def
     do supported.index
 
   (req, res, next) ->
-    locales = new Locales req.headers["accept-language"]
+    if typeof cb == 'function'
+      locale = cb(req)
+
+    locale = req.headers["accept-language"] if !locale
+    locales = new Locales locale
 
     bestLocale = locales.best supported
     req.locale = String bestLocale
